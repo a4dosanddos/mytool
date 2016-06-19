@@ -1,4 +1,4 @@
-package com.example;
+package com.trac.client;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class Main {
+public class GetTicketNumberAndDescription {
 
 	private static final String USER = "test";
 	private static final String PASS = "test";
@@ -33,24 +33,22 @@ public class Main {
 			URL url = new URL(URL_BASE + TICKET_NUMBER[i]);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-			// printHeader(con);
-
 			BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String body;
 			while ((body = reader.readLine()) != null) {
+				// #[チケット番号] [チケットタイトル] を出力
 				if (body.contains("trac-ticket-title")) {
 					String title = reader.readLine().replaceAll("<span class=\"summary\">", "")
 							.replaceAll("</span>", "").replaceAll("    ", "");
-					// #[チケット番号] [チケットタイトル] を出力
 					System.out.println("#" + TICKET_NUMBER[i] + " " + title);
 
+				// Description を出力
 				} else if (body.contains("<div class=\"searchable\">")) {
 					reader.readLine(); // <p>
 					StringBuffer sb = new StringBuffer();
 					String tmp;
 					while (!(tmp = reader.readLine()).equals("</p>"))
 						sb.append(tmp.replaceAll("<br />", "\r\n"));
-					// Description を出力
 					System.out.println(sb.toString());
 				}
 			}
